@@ -220,19 +220,19 @@ public class CubeGen : MonoBehaviour
     return i + 6;
   }
 
-  private void OnDrawGizmos()
-  {
-    if (vertices == null)
-    {
-      return;
-    }
-    Gizmos.color = Color.black;
-    for (int i = 0; i < vertices.Length; i++)
-    {
-      Gizmos.color = Color.black;
-      Gizmos.DrawSphere(vertices[i], 0.1f);
-      Gizmos.color = Color.yellow;
-      Gizmos.DrawRay(vertices[i], normals[i]);
-    }
-  }
+  // private void OnDrawGizmos()
+  // {
+  //   if (vertices == null)
+  //   {
+  //     return;
+  //   }
+  //   Gizmos.color = Color.black;
+  //   for (int i = 0; i < vertices.Length; i++)
+  //   {
+  //     Gizmos.color = Color.black;
+  //     Gizmos.DrawSphere(vertices[i], 0.1f);
+  //     Gizmos.color = Color.yellow;
+  //     Gizmos.DrawRay(vertices[i], normals[i]);
+  //   }
+  // }
 }
