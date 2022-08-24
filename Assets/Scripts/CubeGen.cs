@@ -128,7 +128,7 @@ public class CubeGen : MonoBehaviour
     {
       for (int q = 0; q < ring - 1; q++, quadIndex++)
       {
-        triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex + 1, quadIndex + ring, +ring + 1);
+        triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
       }
       triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex - ring + 1, quadIndex + ring, quadIndex + 1);
     }
