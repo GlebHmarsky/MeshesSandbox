@@ -63,6 +63,7 @@ public class CubeGen : MonoBehaviour
         SetVertex(v++, 0, y, z);
       }
     }
+
     for (int z = 1; z < zSize; z++)
     {
       for (int x = 1; x < xSize; x++)
@@ -134,24 +135,28 @@ public class CubeGen : MonoBehaviour
     }
 
     triangleIndex = CreateTopFace(triangles, triangleIndex, ring);
-    triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
+    // triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
     mesh.triangles = triangles;
   }
 
   private int CreateTopFace(int[] triangles, int ti, int ring)
   {
     // int ring = (xSize + zSize) * 2;
-    int v = ring * ySize;
-    for (int x = 0; x < xSize - 1; x++, v++)
+    int quadIndex = ring * ySize;
+
+    // This is for closest(by index) border on top 
+    for (int x = 0; x < xSize - 1; x++, quadIndex++)
     {
-      ti = SetQuad(triangles, ti, v, v + 1, v + ring - 1, v + ring);
+      ti = SetQuad(triangles, ti, quadIndex, quadIndex + 1, quadIndex + ring - 1, quadIndex + ring);
     }
-    ti = SetQuad(triangles, ti, v, v + 1, v + ring - 1, v + 2);
+    ti = SetQuad(triangles, ti, quadIndex, quadIndex + 1, quadIndex + ring - 1, quadIndex + 2);
+
 
     int vMin = ring * (ySize + 1) - 1;
     int vMid = vMin + 1;
-    int vMax = v + 2;
+    int vMax = quadIndex + 2;
 
+    // This is for middle fill up
     for (int z = 1; z < zSize - 1; z++, vMin--, vMid++, vMax++)
     {
       ti = SetQuad(triangles, ti, vMin, vMid, vMin - 1, vMid + xSize - 1);
@@ -165,6 +170,7 @@ public class CubeGen : MonoBehaviour
     }
 
     int vTop = vMin - 2;
+    // And this is for far'est border
     ti = SetQuad(triangles, ti, vMin, vMid, vTop + 1, vTop);
     for (int x = 1; x < xSize - 1; x++, vTop--, vMid++)
     {
@@ -220,19 +226,19 @@ public class CubeGen : MonoBehaviour
     return i + 6;
   }
 
-  // private void OnDrawGizmos()
-  // {
-  //   if (vertices == null)
-  //   {
-  //     return;
-  //   }
-  //   Gizmos.color = Color.black;
-  //   for (int i = 0; i < vertices.Length; i++)
-  //   {
-  //     Gizmos.color = Color.black;
-  //     Gizmos.DrawSphere(vertices[i], 0.1f);
-  //     Gizmos.color = Color.yellow;
-  //     Gizmos.DrawRay(vertices[i], normals[i]);
-  //   }
-  // }
+  private void OnDrawGizmos()
+  {
+    if (vertices == null)
+    {
+      return;
+    }
+    Gizmos.color = Color.black;
+    for (int i = 0; i < vertices.Length; i++)
+    {
+      Gizmos.color = Color.black;
+      Gizmos.DrawSphere(vertices[i], 0.1f);
+      Gizmos.color = Color.yellow;
+      Gizmos.DrawRay(vertices[i], normals[i]);
+    }
+  }
 }
