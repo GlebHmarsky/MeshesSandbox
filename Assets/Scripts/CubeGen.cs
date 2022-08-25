@@ -7,7 +7,7 @@ using UnityEngine;
 public class CubeGen : MonoBehaviour
 {
   public int xSize, ySize, zSize;
-  public int roundness;
+  public float roundness;
 
   private Mesh mesh;
   private Vector3[] vertices;
@@ -80,8 +80,7 @@ public class CubeGen : MonoBehaviour
     }
 
     mesh.vertices = vertices;
-    //mesh.normals = normals;
-
+    mesh.normals = normals;
   }
 
   private void SetVertex(int i, int x, int y, int z)
@@ -112,7 +111,7 @@ public class CubeGen : MonoBehaviour
     {
       inner.z = zSize - roundness;
     }
-
+    // Double genius lines about how to point normalized vector on spheare with radius = `roundness`
     normals[i] = (vertices[i] - inner).normalized;
     vertices[i] = inner + normals[i] * roundness;
   }
@@ -135,7 +134,7 @@ public class CubeGen : MonoBehaviour
     }
 
     triangleIndex = CreateTopFace(triangles, triangleIndex, ring);
-    // triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
+    triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
     mesh.triangles = triangles;
   }
 

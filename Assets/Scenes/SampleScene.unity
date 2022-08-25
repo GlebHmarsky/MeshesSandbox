@@ -568,10 +568,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 188403752e3837245a04aa6e26bf96a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSize: 3
-  ySize: 2
-  zSize: 4
-  roundness: 0
+  xSize: 7
+  ySize: 7
+  zSize: 9
+  roundness: 3.5
 --- !u!23 &1540684731
 MeshRenderer:
   m_ObjectHideFlags: 0
