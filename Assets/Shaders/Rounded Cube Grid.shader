@@ -42,11 +42,11 @@ Shader "Custom/Rounded Cube Grid"
         void vert (inout appdata_full v, out Input o) {
             UNITY_INITIALIZE_OUTPUT(Input, o);
             #if defined(_FACES_X)
-                o.cubeUV = v.vertex.xy;
+                o.cubeUV = v.color.xy * 255;
             #elif defined(_FACES_Y)
-                o.cubeUV = v.vertex.xz;
+                o.cubeUV = v.color.xz * 255;
             #elif defined(_FACES_Z)
-                o.cubeUV = v.vertex.yz;                
+                o.cubeUV = v.color.yz * 255;
             #endif
         }
 

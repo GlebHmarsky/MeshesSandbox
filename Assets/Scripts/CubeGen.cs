@@ -12,6 +12,7 @@ public class CubeGen : MonoBehaviour
   private Mesh mesh;
   private Vector3[] vertices;
   private Vector3[] normals;
+  private Color32[] cubeUV;
 
   private void Awake()
   {
@@ -31,7 +32,6 @@ public class CubeGen : MonoBehaviour
   }
 
   private void CreateVertices()
-
   {
     int cornerVertices = 8;
     int edgeVertices = (xSize + ySize + zSize - 3) * 4;
@@ -41,6 +41,7 @@ public class CubeGen : MonoBehaviour
         (ySize - 1) * (zSize - 1)) * 2;
     vertices = new Vector3[cornerVertices + edgeVertices + faceVertices];
     normals = new Vector3[vertices.Length];
+    cubeUV = new Color32[vertices.Length];
 
     int v = 0;
     for (int y = 0; y <= ySize; y++)
@@ -80,6 +81,7 @@ public class CubeGen : MonoBehaviour
 
     mesh.vertices = vertices;
     mesh.normals = normals;
+    mesh.colors32 = cubeUV;
   }
 
   private void SetVertex(int i, int x, int y, int z)
@@ -113,6 +115,8 @@ public class CubeGen : MonoBehaviour
     // Double genius lines about how to point normalized vector on spheare with radius = `roundness`
     normals[i] = (vertices[i] - inner).normalized;
     vertices[i] = inner + normals[i] * roundness;
+    cubeUV[i] = new Color32((byte)x, (byte)y, (byte)z, 0);
+
   }
 
   private void CreateTriangles()
@@ -147,7 +151,7 @@ public class CubeGen : MonoBehaviour
 
     tY = CreateTopFace(trianglesY, tY, ring);
     tY = CreateBottomFace(trianglesY, tY, ring);
-    
+
     mesh.subMeshCount = 3;
     mesh.SetTriangles(trianglesZ, 0);
     mesh.SetTriangles(trianglesX, 1);
