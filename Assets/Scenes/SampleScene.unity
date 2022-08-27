@@ -571,7 +571,7 @@ MonoBehaviour:
   xSize: 7
   ySize: 7
   zSize: 9
-  roundness: 3.5
+  roundness: 2
 --- !u!23 &1540684731
 MeshRenderer:
   m_ObjectHideFlags: 0
