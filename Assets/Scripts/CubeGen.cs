@@ -249,7 +249,15 @@ public class CubeGen : MonoBehaviour
 
   private void CreateColliders()
   {
-    gameObject.AddComponent<BoxCollider>();
+    AddBoxCollider(xSize, ySize - roundness * 2, zSize - roundness * 2);
+    AddBoxCollider(xSize - roundness * 2, ySize, zSize - roundness * 2);
+    AddBoxCollider(xSize - roundness * 2, ySize - roundness * 2, zSize);
+  }
+
+  private void AddBoxCollider(float x, float y, float z)
+  {
+    BoxCollider collider = gameObject.AddComponent<BoxCollider>();
+    collider.size = new Vector3(x, y, z);
   }
 
   // private void OnDrawGizmos()
