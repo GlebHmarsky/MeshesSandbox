@@ -250,6 +250,13 @@ public class CubeGen : MonoBehaviour
 
   private void CreateColliders()
   {
+    // For economy of resources we should no add a last of box colliders capsule collider
+    if (roundness == 0)
+    {
+      AddBoxCollider(xSize, ySize, zSize);
+      return;
+    }
+
     AddBoxCollider(xSize, ySize - roundness * 2, zSize - roundness * 2);
     AddBoxCollider(xSize - roundness * 2, ySize, zSize - roundness * 2);
     AddBoxCollider(xSize - roundness * 2, ySize - roundness * 2, zSize);
