@@ -27,6 +27,7 @@ public class CubeGen : MonoBehaviour
 
     CreateVertices();
     CreateTriangles();
+    CreateColliders();
     mesh.RecalculateNormals();
     mesh.normals = mesh.normals.Select(normal => normal * -1).ToArray();
   }
@@ -244,6 +245,11 @@ public class CubeGen : MonoBehaviour
     triangles[i + 2] = triangles[i + 3] = v10;
     triangles[i + 5] = v11;
     return i + 6;
+  }
+
+  private void CreateColliders()
+  {
+    gameObject.AddComponent<BoxCollider>();
   }
 
   // private void OnDrawGizmos()
