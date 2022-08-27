@@ -7,7 +7,7 @@ using UnityEngine;
 public class CubeGen : MonoBehaviour
 {
   public int xSize, ySize, zSize;
-  public int roundness;
+  public float roundness;
 
   private Mesh mesh;
   private Vector3[] vertices;
@@ -17,6 +17,7 @@ public class CubeGen : MonoBehaviour
   {
     Generate();
   }
+
   private void Generate()
 
   {
@@ -26,9 +27,7 @@ public class CubeGen : MonoBehaviour
     CreateVertices();
     CreateTriangles();
     mesh.RecalculateNormals();
-    Debug.Log(mesh.normals[0]);
     mesh.normals = mesh.normals.Select(normal => normal * -1).ToArray();
-    Debug.Log(mesh.normals[0]);
   }
 
   private void CreateVertices()
@@ -63,6 +62,7 @@ public class CubeGen : MonoBehaviour
         SetVertex(v++, 0, y, z);
       }
     }
+
     for (int z = 1; z < zSize; z++)
     {
       for (int x = 1; x < xSize; x++)
@@ -79,8 +79,7 @@ public class CubeGen : MonoBehaviour
     }
 
     mesh.vertices = vertices;
-    //mesh.normals = normals;
-
+    mesh.normals = normals;
   }
 
   private void SetVertex(int i, int x, int y, int z)
@@ -111,47 +110,68 @@ public class CubeGen : MonoBehaviour
     {
       inner.z = zSize - roundness;
     }
-
+    // Double genius lines about how to point normalized vector on spheare with radius = `roundness`
     normals[i] = (vertices[i] - inner).normalized;
     vertices[i] = inner + normals[i] * roundness;
   }
 
   private void CreateTriangles()
   {
-    int quads = (xSize * ySize + xSize * zSize + ySize * zSize) * 2;
-    int[] triangles = new int[quads * 6];
-
+    int[] trianglesZ = new int[(xSize * ySize) * 12];
+    int[] trianglesX = new int[(ySize * zSize) * 12];
+    int[] trianglesY = new int[(xSize * zSize) * 12];
     int ring = (xSize + zSize) * 2;
-    int triangleIndex = 0, quadIndex = 0;
+    int tZ = 0, tX = 0, tY = 0, quadIndex = 0;
+
 
     for (int y = 0; y < ySize; y++, quadIndex++)
     {
-      for (int q = 0; q < ring - 1; q++, quadIndex++)
+      for (int q = 0; q < xSize; q++, quadIndex++)
       {
-        triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+        tZ = SetQuad(trianglesZ, tZ, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
       }
-      triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex - ring + 1, quadIndex + ring, quadIndex + 1);
+      for (int q = 0; q < zSize; q++, quadIndex++)
+      {
+        tX = SetQuad(trianglesX, tX, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      for (int q = 0; q < xSize; q++, quadIndex++)
+      {
+        tZ = SetQuad(trianglesZ, tZ, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      for (int q = 0; q < zSize - 1; q++, quadIndex++)
+      {
+        tX = SetQuad(trianglesX, tX, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      tX = SetQuad(trianglesX, tX, quadIndex, quadIndex - ring + 1, quadIndex + ring, quadIndex + 1);
     }
 
-    triangleIndex = CreateTopFace(triangles, triangleIndex, ring);
-    triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
-    mesh.triangles = triangles;
+    tY = CreateTopFace(trianglesY, tY, ring);
+    tY = CreateBottomFace(trianglesY, tY, ring);
+    
+    mesh.subMeshCount = 3;
+    mesh.SetTriangles(trianglesZ, 0);
+    mesh.SetTriangles(trianglesX, 1);
+    mesh.SetTriangles(trianglesY, 2);
   }
 
   private int CreateTopFace(int[] triangles, int ti, int ring)
   {
     // int ring = (xSize + zSize) * 2;
-    int v = ring * ySize;
-    for (int x = 0; x < xSize - 1; x++, v++)
+    int quadIndex = ring * ySize;
+
+    // This is for closest(by index) border on top 
+    for (int x = 0; x < xSize - 1; x++, quadIndex++)
     {
-      ti = SetQuad(triangles, ti, v, v + 1, v + ring - 1, v + ring);
+      ti = SetQuad(triangles, ti, quadIndex, quadIndex + 1, quadIndex + ring - 1, quadIndex + ring);
     }
-    ti = SetQuad(triangles, ti, v, v + 1, v + ring - 1, v + 2);
+    ti = SetQuad(triangles, ti, quadIndex, quadIndex + 1, quadIndex + ring - 1, quadIndex + 2);
+
 
     int vMin = ring * (ySize + 1) - 1;
     int vMid = vMin + 1;
-    int vMax = v + 2;
+    int vMax = quadIndex + 2;
 
+    // This is for middle fill up
     for (int z = 1; z < zSize - 1; z++, vMin--, vMid++, vMax++)
     {
       ti = SetQuad(triangles, ti, vMin, vMid, vMin - 1, vMid + xSize - 1);
@@ -165,6 +185,7 @@ public class CubeGen : MonoBehaviour
     }
 
     int vTop = vMin - 2;
+    // And this is for far'est border
     ti = SetQuad(triangles, ti, vMin, vMid, vTop + 1, vTop);
     for (int x = 1; x < xSize - 1; x++, vTop--, vMid++)
     {
@@ -173,6 +194,7 @@ public class CubeGen : MonoBehaviour
     ti = SetQuad(triangles, ti, vMid, vTop - 2, vTop, vTop - 1);
     return ti;
   }
+
   private int CreateBottomFace(int[] triangles, int t, int ring)
   {
     int v = 1;
