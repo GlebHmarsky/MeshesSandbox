@@ -17,6 +17,7 @@ public class CubeGen : MonoBehaviour
   {
     Generate();
   }
+
   private void Generate()
 
   {
@@ -26,9 +27,7 @@ public class CubeGen : MonoBehaviour
     CreateVertices();
     CreateTriangles();
     mesh.RecalculateNormals();
-    Debug.Log(mesh.normals[0]);
     mesh.normals = mesh.normals.Select(normal => normal * -1).ToArray();
-    Debug.Log(mesh.normals[0]);
   }
 
   private void CreateVertices()
@@ -118,24 +117,41 @@ public class CubeGen : MonoBehaviour
 
   private void CreateTriangles()
   {
-    int quads = (xSize * ySize + xSize * zSize + ySize * zSize) * 2;
-    int[] triangles = new int[quads * 6];
-
+    int[] trianglesZ = new int[(xSize * ySize) * 12];
+    int[] trianglesX = new int[(ySize * zSize) * 12];
+    int[] trianglesY = new int[(xSize * zSize) * 12];
     int ring = (xSize + zSize) * 2;
-    int triangleIndex = 0, quadIndex = 0;
+    int tZ = 0, tX = 0, tY = 0, quadIndex = 0;
+
 
     for (int y = 0; y < ySize; y++, quadIndex++)
     {
-      for (int q = 0; q < ring - 1; q++, quadIndex++)
+      for (int q = 0; q < xSize; q++, quadIndex++)
       {
-        triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+        tZ = SetQuad(trianglesZ, tZ, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
       }
-      triangleIndex = SetQuad(triangles, triangleIndex, quadIndex, quadIndex - ring + 1, quadIndex + ring, quadIndex + 1);
+      for (int q = 0; q < zSize; q++, quadIndex++)
+      {
+        tX = SetQuad(trianglesX, tX, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      for (int q = 0; q < xSize; q++, quadIndex++)
+      {
+        tZ = SetQuad(trianglesZ, tZ, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      for (int q = 0; q < zSize - 1; q++, quadIndex++)
+      {
+        tX = SetQuad(trianglesX, tX, quadIndex, quadIndex + 1, quadIndex + ring, quadIndex + ring + 1);
+      }
+      tX = SetQuad(trianglesX, tX, quadIndex, quadIndex - ring + 1, quadIndex + ring, quadIndex + 1);
     }
 
-    triangleIndex = CreateTopFace(triangles, triangleIndex, ring);
-    triangleIndex = CreateBottomFace(triangles, triangleIndex, ring);
-    mesh.triangles = triangles;
+    tY = CreateTopFace(trianglesY, tY, ring);
+    tY = CreateBottomFace(trianglesY, tY, ring);
+    
+    mesh.subMeshCount = 3;
+    mesh.SetTriangles(trianglesZ, 0);
+    mesh.SetTriangles(trianglesX, 1);
+    mesh.SetTriangles(trianglesY, 2);
   }
 
   private int CreateTopFace(int[] triangles, int ti, int ring)
@@ -178,6 +194,7 @@ public class CubeGen : MonoBehaviour
     ti = SetQuad(triangles, ti, vMid, vTop - 2, vTop, vTop - 1);
     return ti;
   }
+
   private int CreateBottomFace(int[] triangles, int t, int ring)
   {
     int v = 1;
