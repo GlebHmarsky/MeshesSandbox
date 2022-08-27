@@ -8,6 +8,7 @@ using UnityEngine;
 public class CubeSphere : MonoBehaviour
 {
   public int gridSize;
+  public float radius = 1f;
   private float roundness;
 
   private Mesh mesh;
@@ -87,37 +88,10 @@ public class CubeSphere : MonoBehaviour
 
   private void SetVertex(int i, int x, int y, int z)
   {
-    Vector3 inner = vertices[i] = new Vector3(x, y, z);
-
-    if (x < roundness)
-    {
-      inner.x = roundness;
-    }
-    else if (x > gridSize - roundness)
-    {
-      inner.x = gridSize - roundness;
-    }
-    if (y < roundness)
-    {
-      inner.y = roundness;
-    }
-    else if (y > gridSize - roundness)
-    {
-      inner.y = gridSize - roundness;
-    }
-    if (z < roundness)
-    {
-      inner.z = roundness;
-    }
-    else if (z > gridSize - roundness)
-    {
-      inner.z = gridSize - roundness;
-    }
-    // Double genius lines about how to point normalized vector on spheare with radius = `roundness`
-    normals[i] = (vertices[i] - inner).normalized;
-    vertices[i] = inner + normals[i] * roundness;
+    Vector3 v = new Vector3(x, y, z) * 2f / gridSize - Vector3.one;
+    normals[i] = v.normalized;
+    vertices[i] = normals[i] * radius;
     cubeUV[i] = new Color32((byte)x, (byte)y, (byte)z, 0);
-
   }
 
   private void CreateTriangles()
